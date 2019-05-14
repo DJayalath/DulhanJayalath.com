@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request, jsonify
 from flask_jsglue import JSGlue
+from flask_sslify import SSLify
 import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), "static/decryptr/build"))
 from formatting import decrypt_this
 
 app = Flask(__name__)
+if 'DYNO' in os.environ: # only trigger SSLify if the app is running on Heroku
+    sslify = SSLify(app)
 jsglue = JSGlue(app)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
