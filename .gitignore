@@ -1,2 +1,8 @@
+# Python Virtual Environment
 venv
+
+# IDE stuff
 .vscode
+
+# Python cache folders
+__pycache__/
