@@ -1,0 +1,86 @@
+<div id="about-div" class="p-tile">
+	<div id="about-content">
+		<h3 style="line-height: 3rem; margin: 0;">Dulhan Jayalath</h3>
+		<p style="font-size: 120%; opacity:0.9;">I'm a Computer Science student.</p>
+		<a class="transition button" href="{{ url_for('about') }}">
+			<p style="font-weight: 600; font-size: 80%;">ABOUT ME</p>
+		</a>
+	</div>
+</div>
+<div class="row features main-tiles" style="margin: 0 0 0 0;">
+	<div class="col-sm-3" style="margin: 0; padding: 0;">
+		<div class="container-hover">
+			<a class="transition" href="{{ url_for('telemetry_display') }}">
+				<img class="image" src="{{ url_for('static', filename='files/tile-images/telemetry.jpg') }}"
+					alt="Card image cap" style="width: 100%;" />
+				<div class="middle">
+					<div class="tile-text">TELEMETRY DISPLAY</div>
+				</div>
+			</a>
+		</div>
+	</div>
+	<div class="col-sm-3" style="margin: 0; padding: 0;">
+		<div class="container-hover">
+			<a class="transition" href="{{ url_for('weather_station') }}">
+				<img class="image" src="{{ url_for('static', filename='files/tile-images/ws.jpg') }}"
+					alt="Card image cap" style="width: 100%;" />
+				<div class="middle">
+					<div class="tile-text">WEATHER STATION</div>
+				</div>
+			</a>
+		</div>
+	</div>
+	<div class="col-sm-3" style="margin: 0; padding: 0;">
+		<div class="container-hover">
+			<a class="transition" href="{{ url_for('cloudworks') }}">
+				<img class="image" src="{{ url_for('static', filename='files/tile-images/cloudworks.gif') }}"
+					alt="Card image cap" style="width: 100%;" />
+				<div class="middle">
+					<div class="tile-text">CLOUDWORKS GAME</div>
+				</div>
+			</a>
+		</div>
+	</div>
+	<div class="col-sm-3" style="margin: 0; padding: 0;">
+		<div class="container-hover">
+			<a class="transition" href="{{ url_for('life') }}">
+				<img class="image" src="{{ url_for('static', filename='files/tile-images/life.gif') }}"
+					alt="Card image cap" style="width: 100%;" />
+				<div class="middle">
+					<div class="tile-text">CELLULAR AUTOMATA</div>
+				</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div id="bottom-tile" class="row features">
+	<div class="col-sm-6" style="margin: 0; padding: 0;">
+		<div class="container-hover">
+			<a class="transition" href="{{ url_for('mandelbrot') }}">
+				<img class="image" src="{{ url_for('static', filename='files/tile-images/mandelbrot.gif') }}"
+					alt="Card image cap" style="width: 100%;" />
+				<div class="middle">
+					<div class="tile-text">MANDELBROT SET VIEWER</div>
+				</div>
+			</a>
+		</div>
+	</div>
+	<div class="col-sm-6" style="margin: 0; padding: 0;">
+		<div class="container-hover">
+			<a class="transition" href="{{ url_for('decryptr_port') }}">
+				<img class="image" src="{{ url_for('static', filename='files/tile-images/decryptr.jpg') }}"
+					alt="Card image cap" style="width: 100%;" />
+				<div class="middle">
+					<div class="tile-text">DECRYPTR - CLASSICAL CIPHER CRACKER</div>
+				</div>
+			</a>
+		</div>
+	</div>
+</div>
+<div id="contact-div" class="p-tile">
+	<div>
+		<h3 style="line-height: 3rem; font-weight: 600;">LINKS</h3>
+	</div>
+	Check out my other creations on <a href="https://github.com/armytricks">GitHub</a>
+	<p>Contact: enquiries@dulhanjayalath.com</p>
+</div>

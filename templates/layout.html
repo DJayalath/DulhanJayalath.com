@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="theme-color" content="#ffffff">
+	<title>Dulhan Jayalath</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Dulhan Jayalath Project Portfolio">
+	{{ JSGlue.include() }}
+</head>
+
+<body style="overflow-y: scroll;">
+
+	<div class='loader l-normal'>
+		<div class='loader-container'>
+			<h1 style="font-weight: 700; color: #fefefe; margin-bottom: 1rem;">DJ</h1>
+			<div class='pb-custom' id='bar'></div>
+		</div>
+	</div>
+
+	<div id="moveable" class="m-lower">
+		<div class="d-flex justify-content-center">
+			<div class="container-fluid" id="main-div">
+				<div class="row">
+					<div class="col-sm-6">
+						<h1 style="font-weight: 700; left: 0;"><a class="transition" id="main-title" href="{{ url_for('index') }}">DJ</a></h1>
+					</div>
+					<div class="col-sm-6" style="padding-top: 0.4em;">
+						<ul class="navbar-ul">
+							<li class="navbar-li"><a class="navbutton" id="nav-work" href="#main-tiles">WORK</a></li>
+							<li class="navbar-li"><a class="navbutton" id="nav-contact" href="#main-tiles">CONTACT</a></li>
+							<li class="navbar-li"><a class="navbutton transition" href="{{ url_for('about') }}">ABOUT</a></li>
+							<li class="navbar-li"><a class="navbutton transition" href="{{ url_for('index') }}">HOME</a></li>
+						</ul>
+					</div>
+				</div>
+				<div id="dynamic-body"></div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styling.css') }}" />
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="{{ url_for('static', filename='js/loading-scripts.js') }}"></script>
+	<script type="text/javascript">
+		c_page = flask_return("{{data}}")
+	</script>
+</body>
+
+</html>
