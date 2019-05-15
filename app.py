@@ -82,6 +82,12 @@ def decryptr():
 def entry():
     return jsonify({'text': decrypt_this(request.form['text'],request.form['cipher'],request.form['type'],request.form['timeout'])})
 
+# Error routes
+
+@app.route('/error/route-not-found')
+def route_not_found():
+    return render_template('route-not-found.html')
+
 # Run threaded in production!
 if __name__ == '__main__':
     app.run(threaded=True)
