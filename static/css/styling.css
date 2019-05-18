@@ -140,14 +140,12 @@ body {
 }
 
 a.button {
-  -webkit-appearance: button;
+  /* -webkit-appearance: button;
   -moz-appearance: button;
-  appearance: button;
+  appearance: button; */
 
   text-decoration: none;
-  color: #454545;
-  background-color: #fefefe;
-  padding: 0.4rem 2.2rem;
+  color: #fefefe;
 }
 		
 #main-div {
