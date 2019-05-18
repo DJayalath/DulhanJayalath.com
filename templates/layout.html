@@ -2,12 +2,18 @@
 <html lang="en">
 
 <head>
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styling.css') }}" />
+
 	<meta charset="utf-8">
 	<meta name="theme-color" content="#ffffff">
 	<title>Dulhan Jayalath</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="Dulhan Jayalath Project Portfolio">
 	{{ JSGlue.include() }}
+	
 </head>
 
 <body style="overflow-y: scroll;">
@@ -40,10 +46,6 @@
 		</div>
 	</div>
 
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styling.css') }}" />
-
 	<!-- jQuery library -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
 
@@ -52,6 +54,7 @@
 	<script type="text/javascript">
 		var path = flask_return("{{data}}")
 	</script>
+
 </body>
 
 </html>
