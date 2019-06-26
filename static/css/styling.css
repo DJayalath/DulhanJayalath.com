@@ -31,26 +31,26 @@
   }
 }
 
-h1 a.SiteTitle {
-  font-size: 125%;
+a.SiteTitle {
+  font-size: 200%;
   color: #fb4934;
   padding: 0;
   margin: 0;
 }
 
-h1 a.SiteTitle:link {
+a.SiteTitle:link {
   color: #fb4934;
 }
 
-h1 a.SiteTitle:visited {
+a.SiteTitle:visited {
   color: #fb4934;
 }
 
-h1 a.SiteTitle:hover {
+a.SiteTitle:hover {
   color: #cc241d;
 }
 
-h1 a.SiteTitle:active {
+a.SiteTitle:active {
   color: #cc241d;
 }
 
@@ -72,6 +72,13 @@ a {
 a:hover {
   color: #d65d0e;
   text-decoration: none;
+}
+
+h1 {
+  font-size: 150%;
+  margin-top: 5%;
+  margin-bottom: 5%;
+  color: #b8bb26;
 }
 
 h2 {
