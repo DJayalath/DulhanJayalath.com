@@ -29,46 +29,35 @@ if 'DYNO' in os.environ:
 # Initialise JS Glue
 jsglue = JSGlue(app)
 
-# Root and dynamic URLs used to load content if
-# the site is refreshed by the user or visited
-# for the first time in a new session
-@app.route('/', defaults={"dyn_page": "index"})
-@app.route('/<dyn_page>')
-def layout_dynamic(dyn_page):
-    return render_template('layout.html', data=dyn_page)
-
-# /static/ route used to retrieve the static content
-# that is loaded into the main content divs
-
-@app.route('/static/index')
+@app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/static/about')
+@app.route('/about')
 def about():
     return render_template('about.html')
 
-@app.route('/static/telemetry-display')
+@app.route('/telemetry-display')
 def telemetry_display():
     return render_template('telemetry-display.html')
 
-@app.route('/static/weather-station')
+@app.route('/weather-station')
 def weather_station():
     return render_template('weather-station.html')	
 
-@app.route('/static/cloudworks')
+@app.route('/cloudworks')
 def cloudworks():
     return render_template('cloudworks.html')
 	
-@app.route('/static/life')
+@app.route('/life')
 def life():
     return render_template('life.html')
 
-@app.route('/static/mandelbrot')
+@app.route('/mandelbrot')
 def mandelbrot():
     return render_template('mandelbrot.html')
 
-@app.route('/static/decryptr-port')
+@app.route('/decryptr-port')
 def decryptr_port():
     return render_template('decryptr-port.html')
 
@@ -81,12 +70,6 @@ def decryptr():
 @app.route('/endpoint',methods=['POST'])
 def entry():
     return jsonify({'text': decrypt_this(request.form['text'],request.form['cipher'],request.form['type'],request.form['timeout'])})
-
-# Error routes
-
-@app.route('/error/route-not-found')
-def route_not_found():
-    return render_template('route-not-found.html')
 
 # Run threaded in production!
 if __name__ == '__main__':
