@@ -97,6 +97,11 @@ img {
   margin-right: auto;
 }
 
+.filename {
+  font-size: 80%;
+  color: #928374;
+}
+
 .item1 {
   color: #fabd2f;
 }
