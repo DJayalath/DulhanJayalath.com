@@ -37,6 +37,14 @@ def index():
 def about():
     return render_template('about.html')
 
+# ========== GUIDES ==========
+
+@app.route('/raytracer')
+def ray_tracer():
+    return render_template('raytracer.html')
+
+# ========== PROJECTS ==========
+
 @app.route('/telemetry-display')
 def telemetry_display():
     return render_template('telemetry-display.html')
