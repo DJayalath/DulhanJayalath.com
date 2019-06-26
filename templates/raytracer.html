@@ -1,0 +1,258 @@
+{% extends "layout.html" %}
+{% block title %}Voxel Ray Tracer{% endblock %}
+{% block description %}OpenGL Ray Tracing Tutorial{% endblock %}
+{% block  keywords %}ray tracing, ray casting, opengl, voxel, realtime ray tracing, opengl ray tracing, voxel ray tracing, ray tracing tutorial, ray tracing c++{% endblock %}
+{% block content %}
+<h1 align="center">Writing a Realtime 3D Voxel Ray Tracer Using OpenGL Shaders</h1>
+<h3>Contents</h3>
+<ol>
+    <li><a href="#intro">Introduction</a></li>
+    <li><a href="#prereq">Prerequisites</a></li>
+    <li><a href="#setup">Basic Setup</a></li>
+    <li><a href="#shader">Shader Setup</a></li>
+    <li>Sending voxel data</li>
+    <li>Ray casting: DDA vs Marching</li>
+    <li>Conclusion</li>
+</ol>
+<h4><a id="intro"></a>Introduction</h4>
+<p class="comment">/* This guide is intended to expand and build upon <a href="https://lodev.org/cgtutor/raycasting.html">Lode Vandevenne's tutorial on ray casting</a> to support full ray tracing with the use of GPU computation */</p>
+<p>A crucial distinction: </p>
+<ol>
+    <li><u>Ray casting</u> is the use of ray-surface intersection tests across a <u>single side</u> of a screen (i.e. in one line of pixels) to render models. It allows you to create a 3D perspective from a 2D map.</li>
+    <li><u>Ray tracing</u> is the use of ray-surface intersection tests on <u>every pixel</u> of the screen to render models. It can create a 3D perspective from a 3D map.</li>
+</ol>
+<p>Consequently, ray casting limits you to a fixed height (hence why wolf3D for example does not allow for jumping, multiple heights, or changing the camera pitch).
+    Ray tracing on the other hand can allow you to do all this with the use of a map of voxels (cubes arranged in a three-dimensional grid) instead of a 2D grid of squares.
+</p>
+<p>In this tutorial we will be creating a full, realtime ray tracer that draws everything in the map we give it and handles some basic forward lighting. Since we're using
+    OpenGL, we can use shaders to take advantage of the GPU to make ray tracing extremely fast using the many parallel cores available in modern graphics cards. There are also further optimisations
+    we will make based on the fact we are creating a voxel renderer which handles cubic models only rather than any possible model. At the end, we will explore how this can be extended to
+    efficiently render many other geometries.
+</p>
+<h4><a id="prereq"></a>Prerequisites</h4>
+<p>We will be using the following in this guide and <u>it is up to you to set them up or use an equivalent</u>:</p>
+<ul>
+    <li>OpenGL 4.30 (Check GPU compatibility)</li>
+    <li>GLAD (OpenGL extension library)</li>
+    <li>SDL2 (OpenGL development library)</li>
+    <li>GLM (Vector/Matrix mathematics library)</li>
+</ul>
+<p>You should have some experience with OpenGL otherwise you WILL struggle to understand some of this guide. If you do not and are only interested in how ray casting is done then feel free to skip straight to the ray casting section</p>
+<h4><a id="setup"></a>Basic Setup</h4>
+<p>To begin with, we start with the relevant includes and main function for our program.</p>
+<pre><code class="language-c language-cpp">// OpenGL support libraries
+#include &lt;glad/glad.h&gt;
+#include &lt;SDL2/SDL.h&gt;
+
+// For vector/matrix maths
+#include &lt;glm/glm.hpp&gt;
+#include &lt;glm/gtc/type_ptr.hpp&gt;
+
+// For compiling shaders
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include &lt;sstream&gt;
+#include &lt;vector&gt;
+
+int main(int argc, char* argv[])
+{
+    return EXIT_SUCCESS;
+}
+</code></pre>
+<p>We will now setup SDL with a window and OpenGL context as well as an 'event' variable for polling events (e.g. key presses and mouse movements). Alongside this, we define the OpenGL version
+    we are using as 4.3 and the number of bits assigned for each attribute. In addition, we make sure we are using double buffering to avoid drawing to the screen while it is being displayed.
+</p>
+<pre><code class="language-c language-cpp">SDL_Window* window = nullptr;
+SDL_GLContext glContext;
+SDL_Event event;
+
+int main(int argc, char* argv[])
+{
+    // ========== SDL2 BOILERPLATE ==========
+
+	// Initialisation
+	SDL_Init(SDL_INIT_EVERYTHING);
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	// Create window
+	window = SDL_CreateWindow("Voxel Ray Tracer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, W_WIDTH, W_HEIGHT, SDL_WINDOW_OPENGL);
+	glContext = SDL_GL_CreateContext(window);
+
+	// Capture mouse
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+
+	// GLAD: load all OpenGL function pointers
+	if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
+		std::cout << "Failed to initialize GLAD" << std::endl;
+
+	atexit(SDL_Quit);
+
+	glViewport(0, 0, W_WIDTH, W_HEIGHT);
+	glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    
+
+    return EXIT_SUCCESS;
+}
+</code></pre>
+<p>It should be clear that since we are going to be doing ray tracing, the traditional OpenGL method of creating meshes will not work since this isn't ray tracing at all.
+    Instead, we'll be working on individual pixels. This means we have to create a single quad that encompasses the entire viewport. It will then be through this quad that
+    we can make calculations based on individual pixels through the fragment shader. The following code comes after our SDL2/OpenGL boilerplate and sets up our quad. 
+    It should be quite self-explanatory if you're familiar with OpenGL.
+</p>
+<pre><code class="language-c language-cpp">// Single quad used to draw all pixels
+float vertices[] = {
+    1.0, 1.0, 0.0,  // Top right
+    1.0, -1.0, 0.0,  // Bottom right
+    -1.0, -1.0, 0.0,  // Bottom left
+    -1.0, 1.0, 0.0   // Top left 
+};
+unsigned int indices[] = {
+    0, 1, 3,  // First Triangle
+    1, 2, 3   // Second Triangle
+};
+
+unsigned int VBO, VAO, EBO;
+glGenVertexArrays(1, &VAO);
+glGenBuffers(1, &VBO);
+glGenBuffers(1, &EBO);
+
+glBindVertexArray(VAO);
+
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+glEnableVertexAttribArray(0);
+
+glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+glBindVertexArray(0);
+</code></pre>
+<p>Next, continuing within our main function after our previous code, we setup a simple game loop with event handling so our ray tracer runs continously and is capable of responding to inputs in order to move or rotate the camera.
+    The loop includes some variables used to track the time passed between frames as a way of both knowing the framerate and normalizing actions within the game loop such that they
+    are independant of the framerate. This is particularly useful to keep movement speeds consistent. We also make sure to clear the screen at the start of each game loop and
+    swap buffers to show the newly drawn buffer at the end of each loop.
+</p>
+<pre><code class="language-c language-cpp">double time = 0; //time of current frame
+double oldTime = 0; //time of previous frame
+bool quit = false;
+while(!quit)
+{
+    // Clear previous buffer
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Process inputs
+    while (SDL_PollEvent(&event) != 0)
+    {
+        switch (event.type)
+        {
+        case SDL_KEYDOWN:
+            break;
+        case SDL_KEYUP:
+            break;
+        case SDL_MOUSEMOTION:
+            break;
+        case SDL_QUIT:
+            quit = true;
+            break;
+        default:
+            break;
+        }
+    }
+
+    // Update
+    SDL_GL_SwapWindow(window);
+
+    // Timing
+    oldTime = time;
+    time = SDL_GetTicks();
+    frameTime = (time - oldTime) / 1000.0;
+}
+</code></pre>
+<h4><a id="shader"></a>Shader Setup</h4>
+<p>It is now time to create some shaders! In this section, we won't be doing any ray casting but simply setting up our shaders to work with OpenGL. Firstly, we create two
+    new files called 'shader.vert' and 'shader.frag' for our vertex and fragment shaders respectively. The code below shows how they should look for the basic functionality
+    we need so far. It first uses the preprocessor directive to indicate we are using version 4.30 with core profile. The vertex shader's 'aPos' is the vertex position provided
+    by the quad we created earlier. The fragment shader's 'gl_FragCoord' contains the window-relative coordinates of the current fragment (i.e. the pixel coordinates)
+    and is provided by OpenGL. 'pxColour' is simply the output variable we use to write the colour of the pixel.
+</p>
+<pre><code class="language-c language-cpp">// START SHADER.VERT
+
+#version 430 core
+layout (location = 0) in vec3 aPos;
+
+void main()
+{
+    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+}
+
+// END SHADER.VERT
+
+
+// START SHADER.FRAG
+
+#version 430 core
+
+// Get current pixel
+in vec4 gl_FragCoord;
+
+// Pixel output colour
+out vec4 pxColour;
+
+void main()
+{
+    pxColour = vec4(1, 0, 0, 1);
+}
+
+// END SHADER.FRAG
+</code></pre>
+<p>Next, we need to compile our shaders and use them. Since this is getting further off-topic than I'd like, I've included the functions to compile and check for errors
+    underneath. Just copy them to the bottom of your C++ file and don't forget to include a function declaration at the top of your file. Make sure you define an ID
+    variable (ensure it is an unsigned int) for the shader somewhere near the top of your file outside the main function and call it 'shaderID'.
+</p>
+<p><a href="{{ url_for('static',filename='files/supportfuncs.txt') }}">Shader compilation functions</a> Source: <a href="https://learnopengl.com/">LearnOpenGL</a></p>
+<p>
+    Now, compiling our shaders is as simple as the following lines (assuming your shaders are in your project directory):
+</p>
+<pre><code class="language-c language-cpp">// Compile
+CompileShaders("./shader.vert", "./shader.frag");
+// Use
+glUseProgram(shaderID);
+</code></pre>
+<p>Just make sure this code is written (or copied!) before the game loop begins...</p>
+
+<div id="disqus_thread"></div>
+<script>
+
+/*
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = dulhanjayalath.com/raytracer;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = raytracer; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://dulhanjayalath.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+{% endblock %}

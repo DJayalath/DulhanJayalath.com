@@ -5,20 +5,23 @@
 
 	<!-- Latest compiled and minified CSS -->
 	<!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}"> -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/gruvbox.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styling.css') }}?v=1.0" />
 
 	<meta charset="utf-8">
 	<meta name="theme-color" content="#ffffff">
-	<title>Dulhan Jayalath</title>
+	<title>{% block title %}Dulhan Jayalath{% endblock %}</title>	
+	<meta name="description" content="{% block description %}Programming guides, tutorials and projects{% endblock %}">
+	<meta name="keywords" content="{% block keywords %}Programming, Graphics, C++, CPP, OpenGL, Programming Tutorial{% endblock %}">
+	<meta name="author" content="Dulhan Jayalath">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Dulhan Jayalath Project Portfolio">
 	{{ JSGlue.include() }}
 	
 </head>
 
 <body style="overflow-y: scroll;">
 
-	<h1><a href="{{ url_for('index') }}" class="SiteTitle">Dulhan Jayalath</a></h1>
+	<a href="{{ url_for('index') }}" class="SiteTitle">Dulhan Jayalath</a>
 	<h4 class="SiteSubtitle">// A collection of (hopefully) useful stuff</h4>
 
 	{% block content %}{% endblock %}
@@ -28,7 +31,7 @@
 
 	<!-- Latest compiled JavaScript -->
 	<!-- <script src="{{ url_for('static', filename='js/loading-scripts.js') }}?v=1.0"></script> -->
-
+	<script src="{{ url_for('static', filename='js/prism.js') }}?v=1.0"></script>
 </body>
 
 </html>
