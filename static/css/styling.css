@@ -93,6 +93,11 @@ h4 {
   color: #83a598;
 }
 
+h5 {
+  font-size: 100%;
+  color: #fabd2f;
+}
+
 img {
   max-width: 100%;
   height: auto;
