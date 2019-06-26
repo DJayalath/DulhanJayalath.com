@@ -7,7 +7,11 @@
 <h3>Contents</h3>
 <ol>
     <li><a href="#intro">Introduction</a></li>
-    <li><a href="#prereq">Prerequisites</a></li>
+    <li><a href="#prereq">Prerequisites</a>
+        <ul>
+            <li><a href="#windows">Windows (Visual Studio IDE)</a></li>
+        </ul>
+    </li>
     <li><a href="#setup">Basic Setup</a></li>
     <li><a href="#shader">Shader Setup</a></li>
     <li>Sending voxel data</li>
@@ -30,14 +34,16 @@
     efficiently render many other geometries.
 </p>
 <h4><a id="prereq"></a>Prerequisites</h4>
-<p>We will be using the following in this guide and <u>it is up to you to set them up or use an equivalent</u>:</p>
+<p>We will be using the following dependancies in this guide and <u>it is up to you to set them up or use an equivalent
+    if you are on a platform that isn't described in this guide</u>:</p>
 <ul>
     <li>OpenGL 4.30 (Check GPU compatibility)</li>
-    <li>GLAD (OpenGL extension library)</li>
-    <li>SDL2 (OpenGL development library)</li>
-    <li>GLM (Vector/Matrix mathematics library)</li>
+    <li><a href="https://glad.dav1d.de/">GLAD</a> (OpenGL extension library)</li>
+    <li><a href="https://www.libsdl.org/download-2.0.php">SDL2</a> (OpenGL development library)</li>
+    <li><a href="https://github.com/g-truc/glm/releases">GLM</a> (Vector/Matrix mathematics library)</li>
 </ul>
 <p>You should have some experience with OpenGL otherwise you WILL struggle to understand some of this guide. If you do not and are only interested in how ray casting is done then feel free to skip straight to the ray casting section</p>
+<h5><a id="windows"></a>Windows (Visual Studio IDE)</h5>
 <h4><a id="setup"></a>Basic Setup</h4>
 <p>To begin with, we start with the relevant includes and main function for our program.</p>
 <pre><code class="language-c language-cpp">// OpenGL support libraries
