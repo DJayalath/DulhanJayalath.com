@@ -60,6 +60,10 @@ h4.SiteSubtitle {
   margin: 0;
 }
 
+.comment {
+  color: #928374;
+}
+
 a {
   color: #fe8019;
   text-decoration: none;
