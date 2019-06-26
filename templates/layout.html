@@ -5,14 +5,16 @@
 
 	<!-- Latest compiled and minified CSS -->
 	<!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}"> -->
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/prism.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/gruvbox.css') }}">
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styling.css') }}?v=1.0" />
 
 	<meta charset="utf-8">
 	<meta name="theme-color" content="#ffffff">
-	<title>{% block title %}Dulhan Jayalath{% endblock %}</title>
+	<title>{% block title %}Dulhan Jayalath{% endblock %}</title>	
+	<meta name="description" content="{% block description %}Programming guides, tutorials and projects{% endblock %}">
+	<meta name="keywords" content="{% block keywords %}Programming, Graphics, C++, CPP, OpenGL, Programming Tutorial{% endblock %}">
+	<meta name="author" content="Dulhan Jayalath">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Dulhan Jayalath Project Portfolio">
 	{{ JSGlue.include() }}
 	
 </head>
