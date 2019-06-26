@@ -1,3 +1,5 @@
+{% extends "layout.html" %}
+{% block content %}
 <h2 align="center">IoT PS4 Telemetry Display - 2019 (C++, ESP8266)</h2>
 <h3>Planning</h3>
 <p>Inspired by steering wheels in Formula 1, I wanted to create a mod for my Logitech G29 gaming wheel which added an onboard display. This display should show useful data such as tyre wear, tyre temperature, and estimated fuel usage during a race in the game F1 2018 on my PS4.</p>
@@ -43,3 +45,4 @@ a compact PCB that could fit everything but the battery shield under the space e
 would be a good position to mount a thick, rectangular plate which could hold the PCB, display and battery shield. I first designed a replacement cap which could mount a plate above it using four
 standard M3 self-tapping screws.</p>
 <iframe class="center" src="{{ url_for('static',filename='files/Telem_G29_Cap.html') }}" scrolling="no" height="500"></iframe>
+{% endblock %}
