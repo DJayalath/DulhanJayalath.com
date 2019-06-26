@@ -16,11 +16,16 @@
 <p class="comment">/* This guide is intended to expand and build upon <a href="https://lodev.org/cgtutor/raycasting.html">Lode Vandevenne's tutorial on ray casting</a> to support full ray tracing with the use of GPU computation */</p>
 <p>A crucial distinction: </p>
 <ol>
-    <li><u>Ray casting</u> is the use of ray-surface intersection tests across a <u>single side</u> of a screen (i.e. in one line of pixels) to render models</li>
-    <li><u>Ray tracing</u> is the use of ray-surface intersection tests on <u>every pixel</u> of the screen to render models</li>
+    <li><u>Ray casting</u> is the use of ray-surface intersection tests across a <u>single side</u> of a screen (i.e. in one line of pixels) to render models. It allows you to create a 3D perspective from a 2D map.</li>
+    <li><u>Ray tracing</u> is the use of ray-surface intersection tests on <u>every pixel</u> of the screen to render models. It can create a 3D perspective from a 3D map.</li>
 </ol>
 <p>Consequently, ray casting limits you to a fixed height (hence why wolf3D for example does not allow for jumping, multiple heights, or changing the camera pitch).
-    Ray casting on the other hand can allow you to do all this with the use of a map of voxels (cubes arranged in a three-dimensional grid) instead of a 2D grid of squares.
+    Ray tracing on the other hand can allow you to do all this with the use of a map of voxels (cubes arranged in a three-dimensional grid) instead of a 2D grid of squares.
+</p>
+<p>In this tutorial we will be creating a full, realtime ray tracer that draws everything in the map we give it and handles some basic forward lighting. Since we're using
+    OpenGL, we can use shaders to take advantage of the GPU to make ray tracing extremely fast using the many parallel cores available in modern graphics cards. There are also further optimisations
+    we will make based on the fact we are creating a voxel renderer which handles cubic models only rather than any possible model. At the end, we will explore how this can be extended to
+    efficiently render many other geometries.
 </p>
 <h4><a id="prereq"></a>Prerequisites</h4>
 <p>We will be using the following in this guide and <u>it is up to you to set them up or use an equivalent</u>:</p>
@@ -36,7 +41,7 @@
 <div id="disqus_thread"></div>
 <script>
 
-/**
+/*
 *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
 *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
 /*
