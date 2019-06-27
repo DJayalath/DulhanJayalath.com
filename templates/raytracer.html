@@ -58,10 +58,12 @@
     the compiled binaries. In this folder, you should cut your 'SDL2.dll' file from our 'lib' folder to the folder
     where compiled binaries will reside. This is usually called 'Debug' or 'Release' depending on your configuration.
 </p>
-<p><u>Step 4</u> Setup project configs by doing the following after right-clicking your project and opening properties:
+<p><u>Step 4</u>: Inside the glad zip, make sure you extract 'glad.c' from 'src' and into your project folder. Then
+make sure to add it to your project through Visual Studio. This is absolutely necessary for GLAD to function.</p>
+<p><u>Step 5</u> Setup project configs by doing the following after right-clicking your project and opening properties:
  <br>   - Go to C++ --> General --> Additional Include Directories --> add './include'
  <br>   - Go to Linker --> General --> Additional Library Directories --> add './lib'
- <br>   - Go to Linker --> Input --> Additional Dependancies --> add: 
+ <br>   - Go to Linker --> Input --> Additional Dependancies --> add:
  <br>   (separate by lines): opengl32.lib, SDL2.lib, SDL2main.lib
 </p>
 <h4><a id="setup"></a>Basic Setup</h4>
@@ -93,6 +95,10 @@ int main(int argc, char* argv[])
 SDL_GLContext glContext;
 SDL_Event event;
 
+// Define window width and height in pixels
+#define W_WIDTH 1280
+#define W_HEIGHT 720
+
 int main(int argc, char* argv[])
 {
     // ========== SDL2 BOILERPLATE ==========
@@ -110,7 +116,8 @@ int main(int argc, char* argv[])
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	// Create window
-	window = SDL_CreateWindow("Voxel Ray Tracer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, W_WIDTH, W_HEIGHT, SDL_WINDOW_OPENGL);
+    window = SDL_CreateWindow("Voxel Ray Tracer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+                              W_WIDTH, W_HEIGHT, SDL_WINDOW_OPENGL);
 	glContext = SDL_GL_CreateContext(window);
 
 	// Capture mouse
@@ -260,7 +267,13 @@ CompileShaders("./shader.vert", "./shader.frag");
 glUseProgram(shaderID);
 </code></pre>
 <p>Just make sure this code is written (or copied!) before the game loop begins...</p>
-
+<p>We are now able to use our shader to draw our quad:</p>
+<pre><code class="language-c language-cpp">// Activate shader and render
+glUseProgram(shaderID);
+glBindVertexArray(VAO);
+glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+</code></pre>
+<p>The above code must come just before our buffers are swapped.</p>
 <div id="disqus_thread"></div>
 <script>
 
