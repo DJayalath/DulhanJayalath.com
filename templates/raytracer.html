@@ -285,17 +285,64 @@ glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     our project.
 </p>
 <img src="{{ url_for('static',filename='files/Grey.png') }}" />
-<h4><a id="send"></a>Sending Voxel Data to Shader</h4>
+<h4><a id="send"></a>Sending Voxel Data to the Shader</h4>
 <p>We're now really getting into the meat of this tutorial. We need to create and send some data about our geometries. An easy 
 method of creating our voxel data is a simple array indicating if a voxel is present in a given position. A 0 will represent an empty 
 voxel and any number above 0 will represent a non-empty voxel with the number indicating the colour this voxel should be drawn in. 
 Below is the voxel map we'll be using formatted as a one dimensional array. We'll index into this array using its defined width, height and depth. 
 Make sure it is defined somewhere outside the main function.
 </p>
-<p>It is a rather large array so I've put it in a nice, neat <a href="{{ url_for('static',filename='files/voxel_data.txt') }}">file</a> for you to copy from.</p>
+<p>It is a rather large array so I've put it in a nice, neat <a href="{{ url_for('static',filename='files/voxel_data.txt') }}">file</a> for you to copy from. 
+Layout source: Lode Vandevenne (link TBC).</p>
 <p class="comment">/* You might notice that we're using 32-bits for each voxel which is far more space than we need. However, this is 
     the minimum data type size used in GLSL (the C-like language used in shaders) so it makes indexing far easier this way. If we wanted to,
     however, we could use 8-bits instead and decode the data in the shader using bit shifting and masks. */
+</p>
+<p>To send this data to the shader we use a 'Shader Storage Buffer Object' (SSBO). This feature is only supported in 
+    OpenGL 4.30+. We set it up and pass the data in between our other vertex attributes as follows:
+</p>
+<pre><code class="language-c language-cpp">// NEW
+unsigned int VBO, VAO, EBO, SSBO;
+glGenVertexArrays(1, &VAO);
+glGenBuffers(1, &VBO);
+glGenBuffers(1, &EBO);
+// NEW
+glGenBuffers(1, &SSBO);
+
+glBindVertexArray(VAO);
+
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+// NEW: Add map data to SSBO
+glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+// NEW
+glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(worldMap), worldMap, GL_STATIC_READ);
+glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, SSBO);
+
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+glEnableVertexAttribArray(0);
+
+glBindBuffer(GL_ARRAY_BUFFER, 0);
+// NEW
+glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+glBindVertexArray(0);
+</code></pre>
+<p>We also need to amend our fragment shader to receive this data. Add the following above the main function 
+    in 'shader.frag': 
+</p>
+<pre><code class="language-c language-cpp">layout(std430, binding = 3) buffer voxelData
+{
+    uint world_map[];
+};
+</code></pre>
+<p class="comment">/* You could send this data in older OpenGL versions by packing the data as a texture before 
+    sending it to the fragment shader. This is a little more difficult and finicky than an SSBO so we're not using this 
+    method in our tutorial. */
 </p>
 <div id="disqus_thread"></div>
 <script>
