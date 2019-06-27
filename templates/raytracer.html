@@ -286,7 +286,17 @@ glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 </p>
 <img src="{{ url_for('static',filename='files/Grey.png') }}" />
 <h4><a id="send"></a>Sending Voxel Data to Shader</h4>
-
+<p>We're now really getting into the meat of this tutorial. We need to create and send some data about our geometries. An easy 
+method of creating our voxel data is a simple array indicating if a voxel is present in a given position. A 0 will represent an empty 
+voxel and any number above 0 will represent a non-empty voxel with the number indicating the colour this voxel should be drawn in. 
+Below is the voxel map we'll be using formatted as a one dimensional array. We'll index into this array using its defined width, height and depth. 
+Make sure it is defined somewhere outside the main function.
+</p>
+<p>It is a rather large array so I've put it in a nice, neat <a href="{{ url_for('static',filename='files/voxel_data.txt') }}">file</a> for you to copy from.</p>
+<p class="comment">/* You might notice that we're using 32-bits for each voxel which is far more space than we need. However, this is 
+    the minimum data type size used in GLSL (the C-like language used in shaders) so it makes indexing far easier this way. If we wanted to,
+    however, we could use 8-bits instead and decode the data in the shader using bit shifting and masks. */
+</p>
 <div id="disqus_thread"></div>
 <script>
 
