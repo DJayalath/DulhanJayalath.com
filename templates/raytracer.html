@@ -14,7 +14,7 @@
     </li>
     <li><a href="#setup">Basic Setup</a></li>
     <li><a href="#shader">Shader Setup</a></li>
-    <li>Sending voxel data</li>
+    <li><a href="#send">Sending voxel data</a></li>
     <li>Ray casting: DDA vs Marching</li>
     <li>Conclusion</li>
 </ol>
@@ -217,6 +217,10 @@ while(!quit)
     frameTime = (time - oldTime) / 1000.0;
 }
 </code></pre>
+<p>You should now be able to stare blankly into the dark, empty void of our new window. You may need to close the 
+    debug console to close the window since we haven't handled exit events yet.
+</p>
+<img src="{{ url_for('static',filename='files/Empty.png') }}" />
 <h4><a id="shader"></a>Shader Setup</h4>
 <p>It is now time to create some shaders! In this section, we won't be doing any ray casting but simply setting up our shaders to work with OpenGL. Firstly, we create two
     new files called 'shader.vert' and 'shader.frag' for our vertex and fragment shaders respectively. The code below shows how they should look for the basic functionality
@@ -249,7 +253,9 @@ out vec4 pxColour;
 
 void main()
 {
-    pxColour = vec4(1, 0, 0, 1);
+    // Set to a lovely dull grey colour to reflect
+    // our joyous mood and so that we can see it works
+    pxColour = vec4(0.4, 0.4, 0.4, 1);
 }
 
 // END SHADER.FRAG
@@ -275,6 +281,12 @@ glBindVertexArray(VAO);
 glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 </code></pre>
 <p>The above code must come just before our buffers are swapped.</p>
+<p>And now we can confirm our shader program is working by the new colour we see in the window when we now build
+    our project.
+</p>
+<img src="{{ url_for('static',filename='files/Grey.png') }}" />
+<h4><a id="send"></a>Sending Voxel Data to Shader</h4>
+
 <div id="disqus_thread"></div>
 <script>
 
