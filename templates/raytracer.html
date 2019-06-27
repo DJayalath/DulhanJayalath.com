@@ -44,6 +44,26 @@
 </ul>
 <p>You should have some experience with OpenGL otherwise you WILL struggle to understand some of this guide. If you do not and are only interested in how ray casting is done then feel free to skip straight to the ray casting section</p>
 <h5><a id="windows"></a>Windows (Visual Studio IDE)</h5>
+<p><u>Step 1</u>: Use the links above to download the required development binaries for our dependancies. The options selected for our 
+    version of GLAD are shown below:
+</p>
+<img src="{{ url_for('static',filename='files/GLAD.png') }}" />
+<p><u>Step 2</u> Create two folders called 'include' and 'lib' in your project directory. These will be used for 
+    included headers and library files from our dependancies. 
+</p>
+<p><u>Step 3</u>: Extract the contents of the 'include' folder inside your SDL2 zip into our project 'include' folder (it's best to 
+    extract to a subfolder inside 'include' that you could call 'SDL2'). 
+    Similarly, extract the 'glm', 'glad' and 'KHR' folders from their zips into 'include'. It should be obvious by now that
+    'lib' folders should be extracted into our project's 'lib' folder. Now, run your project once to generate a folder for 
+    the compiled binaries. In this folder, you should cut your 'SDL2.dll' file from our 'lib' folder to the folder
+    where compiled binaries will reside. This is usually called 'Debug' or 'Release' depending on your configuration.
+</p>
+<p><u>Step 4</u> Setup project configs by doing the following after right-clicking your project and opening properties:
+ <br>   - Go to C++ --> General --> Additional Include Directories --> add './include'
+ <br>   - Go to Linker --> General --> Additional Library Directories --> add './lib'
+ <br>   - Go to Linker --> Input --> Additional Dependancies --> add: 
+ <br>   (separate by lines): opengl32.lib, SDL2.lib, SDL2main.lib
+</p>
 <h4><a id="setup"></a>Basic Setup</h4>
 <p>To begin with, we start with the relevant includes and main function for our program.</p>
 <pre><code class="language-c language-cpp">// OpenGL support libraries
@@ -149,7 +169,7 @@ glBindVertexArray(0);
 </code></pre>
 <p>Next, continuing within our main function after our previous code, we setup a simple game loop with event handling so our ray tracer runs continously and is capable of responding to inputs in order to move or rotate the camera.
     The loop includes some variables used to track the time passed between frames as a way of both knowing the framerate and normalizing actions within the game loop such that they
-    are independant of the framerate. This is particularly useful to keep movement speeds consistent. We also make sure to clear the screen at the start of each game loop and
+    are independant of the framerate. This is particularly useful to keep movement speeds consistent and so we will be coming back to it later. We also make sure to clear the screen at the start of each game loop and
     swap buffers to show the newly drawn buffer at the end of each loop.
 </p>
 <pre><code class="language-c language-cpp">double time = 0; //time of current frame
@@ -227,8 +247,8 @@ void main()
 // END SHADER.FRAG
 </code></pre>
 <p>Next, we need to compile our shaders and use them. Since this is getting further off-topic than I'd like, I've included the functions to compile and check for errors
-    underneath. Just copy them to the bottom of your C++ file and don't forget to include a function declaration at the top of your file. Make sure you define an ID
-    variable (ensure it is an unsigned int) for the shader somewhere near the top of your file outside the main function and call it 'shaderID'.
+    underneath. Just copy them to the bottom of your C++ file and don't forget to include a function declaration at the top. Make sure you define a
+    variable (ensure it is an unsigned int) for the shader ID/location somewhere near the top of your file outside the main function and call it 'shaderID'.
 </p>
 <p><a href="{{ url_for('static',filename='files/supportfuncs.txt') }}">Shader compilation functions</a> Source: <a href="https://learnopengl.com/">LearnOpenGL</a></p>
 <p>
