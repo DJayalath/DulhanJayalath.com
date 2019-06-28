@@ -7,10 +7,14 @@
 <h3>Contents</h3>
 <ol>
     <li><a href="#intro">Introduction</a></li>
-    <li><a href="#prereq">Prerequisites</a></li>
+    <li><a href="#prereq">Prerequisites</a>
+        <ul>
+            <li><a href="#windows">Windows (Visual Studio IDE)</a></li>
+        </ul>
+    </li>
     <li><a href="#setup">Basic Setup</a></li>
     <li><a href="#shader">Shader Setup</a></li>
-    <li>Sending voxel data</li>
+    <li><a href="#send">Sending voxel data</a></li>
     <li>Ray casting: DDA vs Marching</li>
     <li>Conclusion</li>
 </ol>
@@ -30,14 +34,38 @@
     efficiently render many other geometries.
 </p>
 <h4><a id="prereq"></a>Prerequisites</h4>
-<p>We will be using the following in this guide and <u>it is up to you to set them up or use an equivalent</u>:</p>
+<p>We will be using the following dependancies in this guide and <u>it is up to you to set them up or use an equivalent
+    if you are on a platform that isn't described in this guide</u>:</p>
 <ul>
     <li>OpenGL 4.30 (Check GPU compatibility)</li>
-    <li>GLAD (OpenGL extension library)</li>
-    <li>SDL2 (OpenGL development library)</li>
-    <li>GLM (Vector/Matrix mathematics library)</li>
+    <li><a href="https://glad.dav1d.de/">GLAD</a> (OpenGL extension library)</li>
+    <li><a href="https://www.libsdl.org/download-2.0.php">SDL2</a> (OpenGL development library)</li>
+    <li><a href="https://github.com/g-truc/glm/releases">GLM</a> (Vector/Matrix mathematics library)</li>
 </ul>
 <p>You should have some experience with OpenGL otherwise you WILL struggle to understand some of this guide. If you do not and are only interested in how ray casting is done then feel free to skip straight to the ray casting section</p>
+<h5><a id="windows"></a>Windows (Visual Studio IDE)</h5>
+<p><u>Step 1</u>: Use the links above to download the required development binaries for our dependancies. The options selected for our 
+    version of GLAD are shown below:
+</p>
+<img src="{{ url_for('static',filename='files/GLAD.png') }}" />
+<p><u>Step 2</u> Create two folders called 'include' and 'lib' in your project directory. These will be used for 
+    included headers and library files from our dependancies. 
+</p>
+<p><u>Step 3</u>: Extract the contents of the 'include' folder inside your SDL2 zip into our project 'include' folder (it's best to 
+    extract to a subfolder inside 'include' that you could call 'SDL2'). 
+    Similarly, extract the 'glm', 'glad' and 'KHR' folders from their zips into 'include'. It should be obvious by now that
+    'lib' folders should be extracted into our project's 'lib' folder. Now, run your project once to generate a folder for 
+    the compiled binaries. In this folder, you should cut your 'SDL2.dll' file from our 'lib' folder to the folder
+    where compiled binaries will reside. This is usually called 'Debug' or 'Release' depending on your configuration.
+</p>
+<p><u>Step 4</u>: Inside the glad zip, make sure you extract 'glad.c' from 'src' and into your project folder. Then
+make sure to add it to your project through Visual Studio. This is absolutely necessary for GLAD to function.</p>
+<p><u>Step 5</u> Setup project configs by doing the following after right-clicking your project and opening properties:
+ <br>   - Go to C++ --> General --> Additional Include Directories --> add './include'
+ <br>   - Go to Linker --> General --> Additional Library Directories --> add './lib'
+ <br>   - Go to Linker --> Input --> Additional Dependancies --> add:
+ <br>   (separate by lines): opengl32.lib, SDL2.lib, SDL2main.lib
+</p>
 <h4><a id="setup"></a>Basic Setup</h4>
 <p>To begin with, we start with the relevant includes and main function for our program.</p>
 <pre><code class="language-c language-cpp">// OpenGL support libraries
@@ -67,6 +95,10 @@ int main(int argc, char* argv[])
 SDL_GLContext glContext;
 SDL_Event event;
 
+// Define window width and height in pixels
+#define W_WIDTH 1280
+#define W_HEIGHT 720
+
 int main(int argc, char* argv[])
 {
     // ========== SDL2 BOILERPLATE ==========
@@ -84,7 +116,8 @@ int main(int argc, char* argv[])
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	// Create window
-	window = SDL_CreateWindow("Voxel Ray Tracer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, W_WIDTH, W_HEIGHT, SDL_WINDOW_OPENGL);
+    window = SDL_CreateWindow("Voxel Ray Tracer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+                              W_WIDTH, W_HEIGHT, SDL_WINDOW_OPENGL);
 	glContext = SDL_GL_CreateContext(window);
 
 	// Capture mouse
@@ -143,11 +176,12 @@ glBindVertexArray(0);
 </code></pre>
 <p>Next, continuing within our main function after our previous code, we setup a simple game loop with event handling so our ray tracer runs continously and is capable of responding to inputs in order to move or rotate the camera.
     The loop includes some variables used to track the time passed between frames as a way of both knowing the framerate and normalizing actions within the game loop such that they
-    are independant of the framerate. This is particularly useful to keep movement speeds consistent. We also make sure to clear the screen at the start of each game loop and
+    are independant of the framerate. This is particularly useful to keep movement speeds consistent and so we will be coming back to it later. We also make sure to clear the screen at the start of each game loop and
     swap buffers to show the newly drawn buffer at the end of each loop.
 </p>
 <pre><code class="language-c language-cpp">double time = 0; //time of current frame
 double oldTime = 0; //time of previous frame
+double frameTime = 0;
 bool quit = false;
 while(!quit)
 {
@@ -183,6 +217,10 @@ while(!quit)
     frameTime = (time - oldTime) / 1000.0;
 }
 </code></pre>
+<p>You should now be able to stare blankly into the dark, empty void of our new window. You may need to close the 
+    debug console to close the window since we haven't handled exit events yet.
+</p>
+<img src="{{ url_for('static',filename='files/Empty.png') }}" />
 <h4><a id="shader"></a>Shader Setup</h4>
 <p>It is now time to create some shaders! In this section, we won't be doing any ray casting but simply setting up our shaders to work with OpenGL. Firstly, we create two
     new files called 'shader.vert' and 'shader.frag' for our vertex and fragment shaders respectively. The code below shows how they should look for the basic functionality
@@ -215,14 +253,16 @@ out vec4 pxColour;
 
 void main()
 {
-    pxColour = vec4(1, 0, 0, 1);
+    // Set to a lovely dull grey colour to reflect
+    // our joyous mood and so that we can see it works
+    pxColour = vec4(0.4, 0.4, 0.4, 1);
 }
 
 // END SHADER.FRAG
 </code></pre>
 <p>Next, we need to compile our shaders and use them. Since this is getting further off-topic than I'd like, I've included the functions to compile and check for errors
-    underneath. Just copy them to the bottom of your C++ file and don't forget to include a function declaration at the top of your file. Make sure you define an ID
-    variable (ensure it is an unsigned int) for the shader somewhere near the top of your file outside the main function and call it 'shaderID'.
+    underneath. Just copy them to the bottom of your C++ file and don't forget to include a function declaration at the top. Make sure you define a
+    variable (ensure it is an unsigned int) for the shader ID/location somewhere near the top of your file outside the main function and call it 'shaderID'.
 </p>
 <p><a href="{{ url_for('static',filename='files/supportfuncs.txt') }}">Shader compilation functions</a> Source: <a href="https://learnopengl.com/">LearnOpenGL</a></p>
 <p>
@@ -234,7 +274,76 @@ CompileShaders("./shader.vert", "./shader.frag");
 glUseProgram(shaderID);
 </code></pre>
 <p>Just make sure this code is written (or copied!) before the game loop begins...</p>
+<p>We are now able to use our shader to draw our quad:</p>
+<pre><code class="language-c language-cpp">// Activate shader and render
+glUseProgram(shaderID);
+glBindVertexArray(VAO);
+glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+</code></pre>
+<p>The above code must come just before our buffers are swapped.</p>
+<p>And now we can confirm our shader program is working by the new colour we see in the window when we now build
+    our project.
+</p>
+<img src="{{ url_for('static',filename='files/Grey.png') }}" />
+<h4><a id="send"></a>Sending Voxel Data to the Shader</h4>
+<p>We're now really getting into the meat of this tutorial. We need to create and send some data about our geometries. An easy 
+method of creating our voxel data is a simple array indicating if a voxel is present in a given position. A 0 will represent an empty 
+voxel and any number above 0 will represent a non-empty voxel with the number indicating the colour this voxel should be drawn in. 
+Below is the voxel map we'll be using formatted as a one dimensional array. We'll index into this array using its defined width, height and depth. 
+Make sure it is defined somewhere outside the main function.
+</p>
+<p>It is a rather large array so I've put it in a nice, neat <a href="{{ url_for('static',filename='files/voxel_data.txt') }}">file</a> for you to copy from. 
+Layout source: Lode Vandevenne (link TBC).</p>
+<p class="comment">/* You might notice that we're using 32-bits for each voxel which is far more space than we need. However, this is 
+    the minimum data type size used in GLSL (the C-like language used in shaders) so it makes indexing far easier this way. If we wanted to,
+    however, we could use 8-bits instead and decode the data in the shader using bit shifting and masks. */
+</p>
+<p>To send this data to the shader we use a 'Shader Storage Buffer Object' (SSBO). This feature is only supported in 
+    OpenGL 4.30+. We set it up and pass the data in between our other vertex attributes as follows:
+</p>
+<pre><code class="language-c language-cpp">// NEW
+unsigned int VBO, VAO, EBO, SSBO;
+glGenVertexArrays(1, &VAO);
+glGenBuffers(1, &VBO);
+glGenBuffers(1, &EBO);
+// NEW
+glGenBuffers(1, &SSBO);
 
+glBindVertexArray(VAO);
+
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+// NEW: Add map data to SSBO
+glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+// NEW
+glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(worldMap), worldMap, GL_STATIC_READ);
+glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, SSBO);
+
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+glEnableVertexAttribArray(0);
+
+glBindBuffer(GL_ARRAY_BUFFER, 0);
+// NEW
+glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+glBindVertexArray(0);
+</code></pre>
+<p>We also need to amend our fragment shader to receive this data. Add the following above the main function 
+    in 'shader.frag': 
+</p>
+<pre><code class="language-c language-cpp">layout(std430, binding = 3) buffer voxelData
+{
+    uint world_map[];
+};
+</code></pre>
+<p class="comment">/* You could send this data in older OpenGL versions by packing the data as a texture before 
+    sending it to the fragment shader. This is a little more difficult and finicky than an SSBO so we're not using this 
+    method in our tutorial. */
+</p>
 <div id="disqus_thread"></div>
 <script>
 
