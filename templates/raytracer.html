@@ -299,7 +299,7 @@ Layout source: Lode Vandevenne (link TBC).</p>
     however, we could use 8-bits instead and decode the data in the shader using bit shifting and masks. */
 </p>
 <p>To send this data to the shader we use a 'Shader Storage Buffer Object' (SSBO). This feature is only supported in 
-    OpenGL 4.30+. We set it up and pass the data in between our other vertex attributes as follows:
+    OpenGL 4.30+. We set it up and pass the data with some new code for the SSBO in between our other vertex attributes:
 </p>
 <pre><code class="language-c language-cpp">// NEW
 unsigned int VBO, VAO, EBO, SSBO;
@@ -342,7 +342,7 @@ glBindVertexArray(0);
 </code></pre>
 <p class="comment">/* You could send this data in older OpenGL versions by packing the data as a texture before 
     sending it to the fragment shader. This is a little more difficult and finicky than an SSBO so we're not using this 
-    method in our tutorial. */
+    method in this tutorial. */
 </p>
 <div id="disqus_thread"></div>
 <script>
