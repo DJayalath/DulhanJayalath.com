@@ -15,7 +15,7 @@
     <li><a href="#setup">Basic Setup</a></li>
     <li><a href="#shader">Shader Setup</a></li>
     <li><a href="#send">Sending voxel data</a></li>
-    <li>Ray casting: DDA vs Marching</li>
+    <li><a href="#casting">Ray casting</a></li>
     <li>Conclusion</li>
 </ol>
 <h4><a id="intro"></a>Introduction</h4>
@@ -343,6 +343,62 @@ glBindVertexArray(0);
 <p class="comment">/* You could send this data in older OpenGL versions by packing the data as a texture before 
     sending it to the fragment shader. This is a little more difficult and finicky than an SSBO so we're not using this 
     method in this tutorial. */
+</p>
+<h4><a id="casting"></a>Ray Casting</h4>
+<p>The vector equation of a line is given by: $\textbf{r}=\textbf{a}+t\textbf{b}$</p>
+<p>The traditional method of ray casting uses the vector equation of a line to represent a ray. The origin, $\textbf{a}$, is the position of the camera and
+    the direction vector, $\textbf{b}$, is the normalised direction in which the camera faces. This assumes the ray is cast from the camera. In its most simple form, the scalar, $t$, 
+    is used to increase the length of the vector by slowly incrementing it. On each increment a test is done to determine if it has
+    intersected a voxel position. A pseudocode implementation in our case might look like this:
+</p>
+<pre><code class="language-c language-cpp">vec3 a = cameraPos; // Ray starting pos
+vec3 b = cameraFront; // Ray direction
+vec3 r; // Position of ray
+float t = 0; // Scalar
+#define INCREMENT 0.1f
+bool hit = false;
+while (!hit)
+{
+    r = a + t * b;
+    IF position r contains voxel THEN
+        hit = true;
+    t += INCREMENT;
+}
+</code></pre>
+<p>When the loop breaks, $\textbf{r}$ will be the point of intersection determined by our simple algorithm. There 
+    are, nevertheless, a few problems with this method. The accuracy of where we determine the intersection position to be is 
+    determined by how small the constant 'INCREMENT' is. Furthermore, if we decrease INCREMENT, the loop will continue 
+    for longer causing slower ray tracing performance. Therefore we need an algorithm that can maximize accuracy and minimize 
+    the number of loops.
+</p>
+<p>Instead, we could amend our algorithm to advance the ray by a large amount and when it intersects a voxel, we step 
+    back a slightly smaller step until we are no longer intersecting the voxel before stepping forwards again - this time 
+    by a smaller increment than previously. Stepping back and forth in smaller subsequent steps continues until we can determine the point of intersection to our required accuracy.
+</p>
+<pre><code class="language-c language-cpp">vec3 a = cameraPos; // Ray starting pos
+vec3 b = cameraFront; // Ray direction
+vec3 r; // Position of ray
+float t = 0; // Scalar
+#define ACCURACY 0.1f
+float INCREMENT 0.5f;
+bool hit = false;
+while (!hit)
+{
+    t += INCREMENT;
+    r = a + t * b;
+    IF position r contains voxel THEN
+        IF (INCREMENT <= ACCURACY)
+            hit = true;
+        INCREMENT = -1 * (INCREMENT - 0.1f);
+}
+</code></pre>
+<p>
+    This is certainly better but since we are using voxels of fixed size, we can in fact determine points of intersection exactly.
+</p>
+<p>
+   <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf">A Fast Voxel 
+    Traversal Algorithm for Ray Tracing (Amanatides and Woo 1987)</a> describes an efficient solution to precisely our problem and 
+    this algorithm gives an exact point of intersection.
 </p>
 <div id="disqus_thread"></div>
 <script>
