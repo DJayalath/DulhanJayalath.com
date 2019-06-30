@@ -22,8 +22,8 @@
 <p class="comment">/* This guide is intended to expand and build upon <a href="https://lodev.org/cgtutor/raycasting.html">Lode Vandevenne's tutorial on ray casting</a> to support full ray tracing with the use of GPU computation */</p>
 <p>A crucial distinction: </p>
 <ol>
-    <li><u>Ray casting</u> is the use of ray-surface intersection tests across a <u>single side</u> of a screen (i.e. in one line of pixels) to render models. It allows you to create a 3D perspective from a 2D map.</li>
-    <li><u>Ray tracing</u> is the use of ray-surface intersection tests on <u>every pixel</u> of the screen to render models. It can create a 3D perspective from a 3D map.</li>
+    <li><span class='important'>Ray casting</span> is the use of ray-surface intersection tests across a <u>single side</u> of a screen (i.e. in one line of pixels) to render models. It allows you to create a 3D perspective from a 2D map.</li>
+    <li><span class='important'>Ray tracing</span> is the use of ray-surface intersection tests on <u>every pixel</u> of the screen to render models. It can create a 3D perspective from a 3D map.</li>
 </ol>
 <p>Consequently, ray casting limits you to a fixed height (hence why wolf3D for example does not allow for jumping, multiple heights, or changing the camera pitch).
     Ray tracing on the other hand can allow you to do all this with the use of a map of voxels (cubes arranged in a three-dimensional grid) instead of a 2D grid of squares.
@@ -59,7 +59,7 @@
     where compiled binaries will reside. This is usually called <span class='file'>Debug</span> or <span class='file'>Release</span> depending on your configuration.
 </p>
 <p><u>Step 4</u>: Inside the glad zip, make sure you extract <span class='file'>glad.c</span> from <span class='file'>src</span> and into your project folder. Then
-make sure to add it to your project through Visual Studio. This is absolutely necessary for GLAD to function.</p>
+make sure to add it to your project through Visual Studio. <span class='important'>This is absolutely necessary for GLAD to function</span>.</p>
 <p><u>Step 5</u> Setup project configs by doing the following after right-clicking your project and opening properties:
  <br>   - Go to C++ --> General --> Additional Include Directories --> add <span class='file'>./include</span>
  <br>   - Go to Linker --> General --> Additional Library Directories --> add <span class='file'>./lib</span>
@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 }
 </code></pre>
 <p>We will now setup SDL with a window and OpenGL context as well as an <span class='variable'>event</span> variable for polling events (e.g. key presses and mouse movements). Alongside this, we define the OpenGL version
-    we are using as 4.3 and the number of bits assigned for each attribute. In addition, we make sure we are using double buffering to avoid drawing to the screen while it is being displayed.
+    we are using as <span class='important'>4.3</span> and the number of bits assigned for each attribute. In addition, we make sure we are using double buffering to avoid drawing to the screen while it is being displayed.
 </p>
 <pre><code class="language-c language-cpp">SDL_Window* window = nullptr;
 SDL_GLContext glContext;
@@ -217,8 +217,8 @@ while(!quit)
     frameTime = (time - oldTime) / 1000.0;
 }
 </code></pre>
-<p>You should now be able to stare blankly into the dark, empty void of our new window. You may need to close the 
-    debug console to close the window since we haven't handled exit events yet.
+<p>You should now be able to stare blankly into the dark, empty void of our new window. You may need to <span class='important'>close the 
+    debug console to close the window</span> since we haven't handled exit events yet.
 </p>
 <img src="{{ url_for('static',filename='files/Empty.png') }}" />
 <h4><a id="shader"></a>Shader Setup</h4>
@@ -280,7 +280,7 @@ glUseProgram(shaderID);
 glBindVertexArray(VAO);
 glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 </code></pre>
-<p>The above code must come just before our buffers are swapped.</p>
+<p>The above code must come just <span class='important'>before</span> our buffers are swapped.</p>
 <p>And now we can confirm our shader program is working by the new colour we see in the window when we now build
     our project.
 </p>
@@ -298,8 +298,8 @@ Layout source: Lode Vandevenne (link TBC).</p>
     the minimum data type size used in GLSL (the C-like language used in shaders) so it makes indexing far easier this way. If we wanted to,
     however, we could use 8-bits instead and decode the data in the shader using bit shifting and masks. */
 </p>
-<p>To send this data to the shader we use a 'Shader Storage Buffer Object' (SSBO). This feature is only supported in 
-    OpenGL 4.30+. We set it up and pass the data with some new code for the SSBO in between our other vertex attributes:
+<p>To send this data to the shader we use a 'Shader Storage Buffer Object' (SSBO). This feature is <span class='important'>only</span> supported in 
+    <span class='important'>OpenGL 4.30+</span>. We set it up and pass the data with some new code for the SSBO in between our other vertex attributes:
 </p>
 <pre><code class="language-c language-cpp">// NEW
 unsigned int VBO, VAO, EBO, SSBO;
@@ -332,8 +332,8 @@ glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 glBindVertexArray(0);
 </code></pre>
-<p>We also need to amend our fragment shader to receive this data. Add the following above the main function 
-    in 'shader.frag': 
+<p>We also need to amend our fragment shader to receive this data. Add the following <span class='important'>above</span> the main function 
+    in <span class='file'>shader.frag</span>: 
 </p>
 <pre><code class="language-c language-cpp">layout(std430, binding = 3) buffer voxelData
 {
@@ -367,7 +367,7 @@ while (!hit)
 </code></pre>
 <p>When the loop breaks, $\textbf{r}$ will be the point of intersection determined by our simple algorithm. There 
     are, nevertheless, a few problems with this method. The accuracy of where we determine the intersection position to be is 
-    determined by how small the constant 'INCREMENT' is. Furthermore, if we decrease INCREMENT, the loop will continue 
+    determined by how small the constant <span class='variable'>INCREMENT</span> is. Furthermore, if we decrease <span class='variable'>INCREMENT</span>, the loop will continue 
     for longer causing slower ray tracing performance. Therefore we need an algorithm that can maximize accuracy and minimize 
     the number of loops.
 </p>
@@ -393,7 +393,7 @@ while (!hit)
 }
 </code></pre>
 <p>
-    This is certainly better but since we are using voxels of fixed size, we can in fact determine points of intersection exactly.
+    This is certainly better but since we are using voxels of fixed size, we can in fact determine points of intersection <span class='important'>exactly</span>.
 </p>
 <p>
    <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf">A Fast Voxel 
