@@ -398,8 +398,16 @@ while (!hit)
 <p>
    <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf">A Fast Voxel 
     Traversal Algorithm for Ray Tracing (Amanatides and Woo 1987)</a> describes an efficient solution to precisely our problem and 
-    this algorithm gives an exact point of intersection and is more efficient than the previous methods. The implementation 
-    we will use is given below in GLSL:
+    this algorithm gives an exact point of intersection and is more efficient than the previous methods. 
+</p>
+<p>
+    The algorithm splits $t$ into $x$, $y$ and $z$ components such that $t_{x}$, 
+    $t_{y}$, and $t_{z}$ are the scalars that advance the vector equation by one voxel in the component direction. 
+    It then uses incremental traversal by moving a single voxel in each component direction at a time to find the exact intersection point 
+    which will lie on a voxel boundary. It's this aspect that allows the algorithm to be so fast. 
+</p>
+ <p>   
+    The implementation we will use is given below in GLSL:
 </p>
 <pre><code class="language-c language-cpp">ivec3 map = ivec3(origin);
 ivec3 stepAmount;
