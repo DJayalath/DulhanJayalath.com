@@ -145,3 +145,18 @@ a.item3:hover {
 a.item4:hover {
   color: #689d6a;
 }
+
+.variable {
+  color: #8ec07c;
+  font-style: italic;
+}
+
+.file {
+  color: #d3869b;
+  font-style: italic;
+}
+
+.important {
+  color: #83a598;
+  font-style: italic;
+}

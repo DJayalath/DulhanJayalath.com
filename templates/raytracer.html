@@ -22,8 +22,8 @@
 <p class="comment">/* This guide is intended to expand and build upon <a href="https://lodev.org/cgtutor/raycasting.html">Lode Vandevenne's tutorial on ray casting</a> to support full ray tracing with the use of GPU computation */</p>
 <p>A crucial distinction: </p>
 <ol>
-    <li><u>Ray casting</u> is the use of ray-surface intersection tests across a <u>single side</u> of a screen (i.e. in one line of pixels) to render models. It allows you to create a 3D perspective from a 2D map.</li>
-    <li><u>Ray tracing</u> is the use of ray-surface intersection tests on <u>every pixel</u> of the screen to render models. It can create a 3D perspective from a 3D map.</li>
+    <li><span class='important'>Ray casting</span> is the use of ray-surface intersection tests across a <u>single side</u> of a screen (i.e. in one line of pixels) to render models. It allows you to create a 3D perspective from a 2D map.</li>
+    <li><span class='important'>Ray tracing</span> is the use of ray-surface intersection tests on <u>every pixel</u> of the screen to render models. It can create a 3D perspective from a 3D map.</li>
 </ol>
 <p>Consequently, ray casting limits you to a fixed height (hence why wolf3D for example does not allow for jumping, multiple heights, or changing the camera pitch).
     Ray tracing on the other hand can allow you to do all this with the use of a map of voxels (cubes arranged in a three-dimensional grid) instead of a 2D grid of squares.
@@ -48,23 +48,23 @@
     version of GLAD are shown below:
 </p>
 <img src="{{ url_for('static',filename='files/GLAD.png') }}" />
-<p><u>Step 2</u> Create two folders called 'include' and 'lib' in your project directory. These will be used for 
+<p><u>Step 2</u> Create two folders called <span class='file'>include</span> and <span class='file'>lib</span> in your project directory. These will be used for 
     included headers and library files from our dependancies. 
 </p>
-<p><u>Step 3</u>: Extract the contents of the 'include' folder inside your SDL2 zip into our project 'include' folder (it's best to 
-    extract to a subfolder inside 'include' that you could call 'SDL2'). 
-    Similarly, extract the 'glm', 'glad' and 'KHR' folders from their zips into 'include'. It should be obvious by now that
-    'lib' folders should be extracted into our project's 'lib' folder. Now, run your project once to generate a folder for 
+<p><u>Step 3</u>: Extract the contents of the <span class='file'>include</span> folder inside your SDL2 zip into our project <span class='file'>include</span> folder (it's best to 
+    extract to a subfolder inside <span class='file'>include</span> that you could call <span class='file'>SDL2</span>). 
+    Similarly, extract the <span class='file'>glm</span>, <span class='file'>glad</span> and <span class='file'>KHR</span> folders from their zips into <span class='file'>include</span>. It should be obvious by now that
+    <span class='file'>lib</span> folders should be extracted into our project's <span class='file'>lib</span> folder. Now, run your project once to generate a folder for 
     the compiled binaries. In this folder, you should cut your 'SDL2.dll' file from our 'lib' folder to the folder
-    where compiled binaries will reside. This is usually called 'Debug' or 'Release' depending on your configuration.
+    where compiled binaries will reside. This is usually called <span class='file'>Debug</span> or <span class='file'>Release</span> depending on your configuration.
 </p>
-<p><u>Step 4</u>: Inside the glad zip, make sure you extract 'glad.c' from 'src' and into your project folder. Then
-make sure to add it to your project through Visual Studio. This is absolutely necessary for GLAD to function.</p>
+<p><u>Step 4</u>: Inside the glad zip, make sure you extract <span class='file'>glad.c</span> from <span class='file'>src</span> and into your project folder. Then
+make sure to add it to your project through Visual Studio. <span class='important'>This is absolutely necessary for GLAD to function</span>.</p>
 <p><u>Step 5</u> Setup project configs by doing the following after right-clicking your project and opening properties:
- <br>   - Go to C++ --> General --> Additional Include Directories --> add './include'
- <br>   - Go to Linker --> General --> Additional Library Directories --> add './lib'
+ <br>   - Go to C++ --> General --> Additional Include Directories --> add <span class='file'>./include</span>
+ <br>   - Go to Linker --> General --> Additional Library Directories --> add <span class='file'>./lib</span>
  <br>   - Go to Linker --> Input --> Additional Dependancies --> add:
- <br>   (separate by lines): opengl32.lib, SDL2.lib, SDL2main.lib
+ <br>   (separate by lines): <span class='file'>opengl32.lib</span>, <span class='file'>SDL2.lib</span>, <span class='file'>SDL2main.lib</span>
 </p>
 <h4><a id="setup"></a>Basic Setup</h4>
 <p>To begin with, we start with the relevant includes and main function for our program.</p>
@@ -88,8 +88,8 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 </code></pre>
-<p>We will now setup SDL with a window and OpenGL context as well as an 'event' variable for polling events (e.g. key presses and mouse movements). Alongside this, we define the OpenGL version
-    we are using as 4.3 and the number of bits assigned for each attribute. In addition, we make sure we are using double buffering to avoid drawing to the screen while it is being displayed.
+<p>We will now setup SDL with a window and OpenGL context as well as an <span class='variable'>event</span> variable for polling events (e.g. key presses and mouse movements). Alongside this, we define the OpenGL version
+    we are using as <span class='important'>4.3</span> and the number of bits assigned for each attribute. In addition, we make sure we are using double buffering to avoid drawing to the screen while it is being displayed.
 </p>
 <pre><code class="language-c language-cpp">SDL_Window* window = nullptr;
 SDL_GLContext glContext;
@@ -217,16 +217,16 @@ while(!quit)
     frameTime = (time - oldTime) / 1000.0;
 }
 </code></pre>
-<p>You should now be able to stare blankly into the dark, empty void of our new window. You may need to close the 
-    debug console to close the window since we haven't handled exit events yet.
+<p>You should now be able to stare blankly into the dark, empty void of our new window. You may need to <span class='important'>close the 
+    debug console to close the window</span> since we haven't handled exit events yet.
 </p>
 <img src="{{ url_for('static',filename='files/Empty.png') }}" />
 <h4><a id="shader"></a>Shader Setup</h4>
 <p>It is now time to create some shaders! In this section, we won't be doing any ray casting but simply setting up our shaders to work with OpenGL. Firstly, we create two
-    new files called 'shader.vert' and 'shader.frag' for our vertex and fragment shaders respectively. The code below shows how they should look for the basic functionality
-    we need so far. It first uses the preprocessor directive to indicate we are using version 4.30 with core profile. The vertex shader's 'aPos' is the vertex position provided
-    by the quad we created earlier. The fragment shader's 'gl_FragCoord' contains the window-relative coordinates of the current fragment (i.e. the pixel coordinates)
-    and is provided by OpenGL. 'pxColour' is simply the output variable we use to write the colour of the pixel.
+    new files called <span class='file'>shader.vert</span> and <span class='file'>shader.frag</span> for our vertex and fragment shaders respectively. The code below shows how they should look for the basic functionality
+    we need so far. It first uses the preprocessor directive to indicate we are using version 4.30 with core profile. The vertex shader's <span class='variable'>aPos</span> is the vertex position provided
+    by the quad we created earlier. The fragment shader's <span class='variable'>gl_FragCoord</span> contains the window-relative coordinates of the current fragment (i.e. the pixel coordinates)
+    and is provided by OpenGL. <span class='variable'>pxColour</span> is simply the output variable we use to write the colour of the pixel.
 </p>
 <pre><code class="language-c language-cpp">// START SHADER.VERT
 
@@ -262,7 +262,7 @@ void main()
 </code></pre>
 <p>Next, we need to compile our shaders and use them. Since this is getting further off-topic than I'd like, I've included the functions to compile and check for errors
     underneath. Just copy them to the bottom of your C++ file and don't forget to include a function declaration at the top. Make sure you define a
-    variable (ensure it is an unsigned int) for the shader ID/location somewhere near the top of your file outside the main function and call it 'shaderID'.
+    variable (ensure it is an unsigned int) for the shader ID/location somewhere near the top of your file outside the main function and call it <span class='variable'>shaderID</span>.
 </p>
 <p><a href="{{ url_for('static',filename='files/supportfuncs.txt') }}">Shader compilation functions</a> Source: <a href="https://learnopengl.com/">LearnOpenGL</a></p>
 <p>
@@ -280,7 +280,7 @@ glUseProgram(shaderID);
 glBindVertexArray(VAO);
 glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 </code></pre>
-<p>The above code must come just before our buffers are swapped.</p>
+<p>The above code must come just <span class='important'>before</span> our buffers are swapped.</p>
 <p>And now we can confirm our shader program is working by the new colour we see in the window when we now build
     our project.
 </p>
@@ -298,8 +298,8 @@ Layout source: Lode Vandevenne (link TBC).</p>
     the minimum data type size used in GLSL (the C-like language used in shaders) so it makes indexing far easier this way. If we wanted to,
     however, we could use 8-bits instead and decode the data in the shader using bit shifting and masks. */
 </p>
-<p>To send this data to the shader we use a 'Shader Storage Buffer Object' (SSBO). This feature is only supported in 
-    OpenGL 4.30+. We set it up and pass the data with some new code for the SSBO in between our other vertex attributes:
+<p>To send this data to the shader we use a 'Shader Storage Buffer Object' (SSBO). This feature is <span class='important'>only</span> supported in 
+    <span class='important'>OpenGL 4.30+</span>. We set it up and pass the data with some new code for the SSBO in between our other vertex attributes:
 </p>
 <pre><code class="language-c language-cpp">// NEW
 unsigned int VBO, VAO, EBO, SSBO;
@@ -332,8 +332,8 @@ glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 glBindVertexArray(0);
 </code></pre>
-<p>We also need to amend our fragment shader to receive this data. Add the following above the main function 
-    in 'shader.frag': 
+<p>We also need to amend our fragment shader to receive this data. Add the following <span class='important'>above</span> the main function 
+    in <span class='file'>shader.frag</span>: 
 </p>
 <pre><code class="language-c language-cpp">layout(std430, binding = 3) buffer voxelData
 {
@@ -367,7 +367,7 @@ while (!hit)
 </code></pre>
 <p>When the loop breaks, $\textbf{r}$ will be the point of intersection determined by our simple algorithm. There 
     are, nevertheless, a few problems with this method. The accuracy of where we determine the intersection position to be is 
-    determined by how small the constant 'INCREMENT' is. Furthermore, if we decrease INCREMENT, the loop will continue 
+    determined by how small the constant <span class='variable'>INCREMENT</span> is. Furthermore, if we decrease <span class='variable'>INCREMENT</span>, the loop will continue 
     for longer causing slower ray tracing performance. Therefore we need an algorithm that can maximize accuracy and minimize 
     the number of loops.
 </p>
@@ -393,13 +393,21 @@ while (!hit)
 }
 </code></pre>
 <p>
-    This is certainly better but since we are using voxels of fixed size, we can in fact determine points of intersection exactly.
+    This is certainly better but since we are using voxels of fixed size, we can in fact determine points of intersection <span class='important'>exactly</span>.
 </p>
 <p>
    <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.42.3443&rep=rep1&type=pdf">A Fast Voxel 
     Traversal Algorithm for Ray Tracing (Amanatides and Woo 1987)</a> describes an efficient solution to precisely our problem and 
-    this algorithm gives an exact point of intersection and is more efficient than the previous methods. The implementation 
-    we will use is given below in GLSL:
+    this algorithm gives an exact point of intersection and is more efficient than the previous methods. 
+</p>
+<p>
+    The algorithm splits $t$ into $x$, $y$ and $z$ components such that $t_{x}$, 
+    $t_{y}$, and $t_{z}$ are the scalars that advance the vector equation by one voxel in the component direction. 
+    It then uses incremental traversal by moving a single voxel in each component direction at a time to find the exact intersection point 
+    which will lie on a voxel boundary. It's this aspect that allows the algorithm to be so fast. 
+</p>
+ <p>   
+    The implementation we will use is given below in GLSL:
 </p>
 <pre><code class="language-c language-cpp">ivec3 map = ivec3(origin);
 ivec3 stepAmount;
@@ -499,7 +507,19 @@ do
     voxel = world_map[map.y * MAP_WIDTH * MAP_HEIGHT + map.z * MAP_WIDTH + map.x];
 } while (voxel == 0);
 </code></pre>
-<p></p>
+<p>
+    <span class="variable">map</span> is the vector which describes the current voxel we are in. Hence, it is initialised by casting <span class="variable">origin</span> to a vector of integers. 
+    <span class="variable">stepAmount</span> indicates the direction in which <span class="variable">map</span>'s $x$, $y$, and $z$ components are incremented. This depends on the direction of the vector so 
+    we test if it is positive, negative or zero in each component to determine <span class="variable">stepAmount</span>. <span class="variable">tMax</span> is the value of $t$ at which the 
+    ray crosses the voxel boundary in the component direction. <span class="variable">tDelta</span> is how far along the ray we must move in terms of $t$ for the component of such a 
+    movement to equal the width of one voxel.
+</p>
+<p>
+    The iterative part of the algorithm simply increases <span class="variable">tMax</span> in the relevant component when it is 
+    less than the other two components in order to reach a voxel boundary. <span class="variable">map</span> is also incremented so 
+    that we continue to track which voxel the ray has currently reached. A test is made after each loop to see if this location contains a 
+    non-empty voxel and thus if we should break out of the loop.
+</p>
 <div id="disqus_thread"></div>
 <script>
 
