@@ -41,7 +41,7 @@ def about():
 
 @app.route('/raytracer')
 def ray_tracer():
-    return render_template('raytracer.html')
+    return render_template('raytracer.html', ads=True)
 
 # ========== PROJECTS ==========
 
