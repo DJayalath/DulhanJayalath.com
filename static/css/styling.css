@@ -145,3 +145,8 @@ a.item3:hover {
 a.item4:hover {
   color: #689d6a;
 }
+
+.variable {
+  color: #8ec07c;
+  font-style: italic;
+}
