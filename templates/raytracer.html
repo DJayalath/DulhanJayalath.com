@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 </code></pre>
-<p>We will now setup SDL with a window and OpenGL context as well as an 'event' variable for polling events (e.g. key presses and mouse movements). Alongside this, we define the OpenGL version
+<p>We will now setup SDL with a window and OpenGL context as well as an <span class='variable'>event</span> variable for polling events (e.g. key presses and mouse movements). Alongside this, we define the OpenGL version
     we are using as 4.3 and the number of bits assigned for each attribute. In addition, we make sure we are using double buffering to avoid drawing to the screen while it is being displayed.
 </p>
 <pre><code class="language-c language-cpp">SDL_Window* window = nullptr;
@@ -224,9 +224,9 @@ while(!quit)
 <h4><a id="shader"></a>Shader Setup</h4>
 <p>It is now time to create some shaders! In this section, we won't be doing any ray casting but simply setting up our shaders to work with OpenGL. Firstly, we create two
     new files called 'shader.vert' and 'shader.frag' for our vertex and fragment shaders respectively. The code below shows how they should look for the basic functionality
-    we need so far. It first uses the preprocessor directive to indicate we are using version 4.30 with core profile. The vertex shader's 'aPos' is the vertex position provided
-    by the quad we created earlier. The fragment shader's 'gl_FragCoord' contains the window-relative coordinates of the current fragment (i.e. the pixel coordinates)
-    and is provided by OpenGL. 'pxColour' is simply the output variable we use to write the colour of the pixel.
+    we need so far. It first uses the preprocessor directive to indicate we are using version 4.30 with core profile. The vertex shader's <span class='variable'>aPos</span> is the vertex position provided
+    by the quad we created earlier. The fragment shader's <span class='variable'>gl_FragCoord</span> contains the window-relative coordinates of the current fragment (i.e. the pixel coordinates)
+    and is provided by OpenGL. <span class='variable'>pxColour</span> is simply the output variable we use to write the colour of the pixel.
 </p>
 <pre><code class="language-c language-cpp">// START SHADER.VERT
 
@@ -262,7 +262,7 @@ void main()
 </code></pre>
 <p>Next, we need to compile our shaders and use them. Since this is getting further off-topic than I'd like, I've included the functions to compile and check for errors
     underneath. Just copy them to the bottom of your C++ file and don't forget to include a function declaration at the top. Make sure you define a
-    variable (ensure it is an unsigned int) for the shader ID/location somewhere near the top of your file outside the main function and call it 'shaderID'.
+    variable (ensure it is an unsigned int) for the shader ID/location somewhere near the top of your file outside the main function and call it <span class='variable'>shaderID</span>.
 </p>
 <p><a href="{{ url_for('static',filename='files/supportfuncs.txt') }}">Shader compilation functions</a> Source: <a href="https://learnopengl.com/">LearnOpenGL</a></p>
 <p>
@@ -507,7 +507,19 @@ do
     voxel = world_map[map.y * MAP_WIDTH * MAP_HEIGHT + map.z * MAP_WIDTH + map.x];
 } while (voxel == 0);
 </code></pre>
-<p></p>
+<p>
+    <span class="variable">map</span> is the vector which describes the current voxel we are in. Hence, it is initialised by casting <span class="variable">origin</span> to a vector of integers. 
+    <span class="variable">stepAmount</span> indicates the direction in which <span class="variable">map</span>'s $x$, $y$, and $z$ components are incremented. This depends on the direction of the vector so 
+    we test if it is positive, negative or zero in each component to determine <span class="variable">stepAmount</span>. <span class="variable">tMax</span> is the value of $t$ at which the 
+    ray crosses the voxel boundary in the component direction. <span class="variable">tDelta</span> is how far along the ray we must move in terms of $t$ for the component of such a 
+    movement to equal the width of one voxel.
+</p>
+<p>
+    The iterative part of the algorithm simply increases <span class="variable">tMax</span> in the relevant component when it is 
+    less than the other two components in order to reach a voxel boundary. <span class="variable">map</span> is also incremented so 
+    that we continue to track which voxel the ray has currently reached. A test is made after each loop to see if this location contains a 
+    non-empty voxel and thus if we should break out of the loop.
+</p>
 <div id="disqus_thread"></div>
 <script>
 
