@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+{% block title %}Proper Collision Detection And Resolution{% endblock %}
+{% block description %}A guide to accurate and reliable collision detection and resolution{% endblock %}
+{% block  keywords %}collison detection, collision resolution, intersection, proper collision detection, reliable collision detection, accurate collision detection, proper collision resolution, reliable collision resolution, accurate collision resolution, collision response{% endblock %}
+{% block content %}
+<h1 align="center">Accurate And Reliable Collision Detection And Resolution</h1>
+<h3>Contents</h3>
+<ol>
+    <li><a href="#intro">Introduction</a></li>
+    <li><a href="#expl">Collision Detection</a></li>
+    <li><a href="#res">Collision Resolution</a></li>
+    <li><a href="#lim">Limitations</a></li>
+    <li>Practical Example (Coming soon?)</li>
+    <li><a href="#conc">Conclusion</a></li>
+</ol>
+<h4><a id="intro"></a>Introduction</h4>
+<p>
+    Collision detection and resolution is a topic that appears trivial to those who haven't tried it. To those who have, it is infamous for being a problem that is seemingly
+    impossible to solve without some kind of caveat. In this guide, we will try a more simple approach to collision resolution that is both reliable and accurate in every scenario.
+    We will aim to produce an algorithm that doesn't require any 'hacks' to handle rare cases and always responds as we'd expect. We will begin with applying this to 
+    <span class='important'>axis-aligned bounding boxes (AABB)</span> and then attempt to modify it to work with other, more complex collision models.
+</p>
+<h4><a id="expl"></a>Collision Detection</h4>
+<p>
+    The typical AABB collision model already uses a reliable and accurate detection algorithm. In the 2D case, a test is made for a collision in the x-axis, followed by a test for 
+    a collision in the y-axis. If a collision is detected in both axes we can conclude there is a collision between two given shapes. Easy!
+</p>
+<pre><code class="language-rust">fn is_colliding(a: &amp;Square, b: &amp;Square) -&gt; bool {
+
+    // Collision x-axis?
+    let is_colliding_x: bool = 
+        // Is bottom right of shape A further right than the bottom left of shape B?
+        a.pos.x + a.size.x &gt;= b.pos.x &amp;&amp;
+        // Is the bottom right of shape B further right than the bottom left of shape A?
+        b.pos.x + b.size &gt;= a.pos.x;
+
+    // Collision y-axis?
+    let is_colliding_y: bool = 
+        // Is bottom left of shape A further down than the top left of shape B?
+        a.pos.y + a.size.y &gt;= b.pos.y &amp;&amp;
+        // Is bottom left of shape B further down than the top left of shape A?
+        b.pos.y + b.size &gt;= a.pos.y;
+
+    // Return true if colliding in both axes
+    is_colliding_x &amp;&amp; is_colliding_y
+}
+</code></pre>
+<p class="comment">/* The code above is in <span class='important'>Rust</span>! '-> bool' means the function returns a boolean value. Expressions (lines that don't end in ';') are 
+    used as the return statement. */
+</p>
+<p>This example assumes the local origin of each square is the <span class='important'>top left</span> of the shape. This is why we add the <span class='variable'>size</span> attribute to get other corners. The 
+    example uses squares so the width and height are the same. Each are represented by the <span class='variable'>size</span> attribute.
+</p>
+<h4><a id="res"></a>Collision Resolution</h4>
+<p>
+    This is where we take a more unorthodox approach to the typical AABB resolution approach. One common method would be to reverse the colliding 
+    object's velocity as soon as a collision is detected. This simplistic approach is also the worst approach since a collision might only be detected when 
+    the objects are half way through each other. This leads to the user seeing objects pass through each other before deflecting. While this is less noticeable if 
+    your game is capable of running at a high tick rate, fast moving objects in the game will inevitabley cause this problem no matter how high the game's tick rate.
+</p>
+<p>
+    Another, more reliable method is to calculate the line created by the intersection. It is then possible to subtract this from both objects in opposite directions 
+    before reversing their velocities. This prevents the visible 'passing through' of the colliding shapes. However, this becomes much more difficult to implement when 
+    complex collision models are used and it is often easier to use the approach we will use in this guide.
+</p>
+<p>
+    The method we will use does the following <span class='important'>once a collision is detected</span>:
+    <ol>
+        <li>Calculate sign of velocity of colliding objects in all axes</li>
+        <li>Subtract minimum value (e.g. one pixel) in reverse direction from position in all axes</li>
+        <li>Repeat until a collision is no longer detected</li>
+        <li>Reverse original velocities</li>
+    </ol>
+    It's a simple and surprisingly reliable algorithm that can be applied to all collision models. Let's have a look at what it might look like in code:
+</p>
+<pre><code class="language-rust">loop {
+        if is_colliding(&a, &b) {
+            // Increment back in x-axis
+            a.pos.x -= sign(a.vel.x);
+        } else {
+            a.vel.x = -a.vel.x;
+            break
+        }
+
+        if is_colliding(&a, &b) {
+            // Increment back in y-axis
+            a.pos.y -= sign(a.vel.y);
+        } else {
+            a.vel.y = -a.vel.y;
+            break
+        }
+    }
+</code></pre>
+<p class="comment">// The above assumes object <span class='variable'>b</span> is fixed. If <span class='variable'>b</span> is also moving, just repeat the if blocks for changes in <span class='variable'>b</span> as well!</p>
+<p>
+    All we are doing is incrementally moving objects back in each axis until they are no longer colliding. It's incredibly easy and reliable*.
+</p>
+<h4><a id="lim"></a>*Limitations</h4>
+<p>
+    Crucially, this has some serious limitations depending on where you implement it. The minimum constant amount you subtract from each axis may not 
+    exist in the coordinate space you use. If your coordinate space is the dimensions of the screen, a single pixel is fine. However, in OpenGL, there is no 
+    minimum amount an object can move (unless you consider the minimum usable value of a type). In this situation it becomes difficult to pick a value to use 
+    because a small value will increase the iterations of the subtraction loop and a large value may make the 'passing through' affect noticeable.
+</p>
+<h4><a id="conc"></a>Conclusion</h4>
+<p>
+    While this method is easy to implement. Consider how it scales when lots of objects are colliding. Looping is really inefficient. It is often worth the 
+    time taken to write the line intersection method when this just won't cut it.
+</p>
+{% endblock %}
