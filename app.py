@@ -43,6 +43,16 @@ def about():
 def ray_tracer():
     return render_template('raytracer.html', ads=True)
 
+@app.route('/proper-collision-resolution-and-response')
+def collisions():
+    return render_template('collisions.html', ads=True)
+
+# ADSENSE ONLY
+
+@app.route('/ads.txt')
+def ads():
+    return render_template('ads.txt')
+
 # ========== PROJECTS ==========
 
 @app.route('/telemetry-display')
