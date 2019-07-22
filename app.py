@@ -47,6 +47,10 @@ def ray_tracer():
 def collisions():
     return render_template('collisions.html', ads=True)
 
+@app.route('/intelligent-music-player')
+def music_player():
+    return render_template('musicplayer.html', ads=True)
+
 # ADSENSE ONLY
 
 @app.route('/ads.txt')
