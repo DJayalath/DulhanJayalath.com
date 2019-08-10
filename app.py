@@ -21,10 +21,11 @@ from formatting import decrypt_this
 # Initialise flask app!
 app = Flask(__name__)
 
+# TODO Renew certificate because it expired!
 # Only trigger SSLify if the app is running on Heroku since I
 # have no idea how to do SSL redirects properly there
-if 'DYNO' in os.environ:
-    sslify = SSLify(app)
+# if 'DYNO' in os.environ:
+#     sslify = SSLify(app)
 
 # Initialise JS Glue
 jsglue = JSGlue(app)
@@ -46,6 +47,10 @@ def ray_tracer():
 @app.route('/proper-collision-resolution-and-response')
 def collisions():
     return render_template('collisions.html', ads=True)
+
+@app.route('/intelligent-music-player')
+def music_player():
+    return render_template('musicplayer.html', ads=True)
 
 # ADSENSE ONLY
 
