@@ -42,7 +42,21 @@ def about():
 
 @app.route('/raytracer')
 def ray_tracer():
-    return render_template('raytracer.html')
+    return render_template('raytracer.html', ads=True)
+
+@app.route('/proper-collision-resolution-and-response')
+def collisions():
+    return render_template('collisions.html', ads=True)
+
+@app.route('/intelligent-music-player')
+def music_player():
+    return render_template('musicplayer.html', ads=True)
+
+# ADSENSE ONLY
+
+@app.route('/ads.txt')
+def ads():
+    return render_template('ads.txt')
 
 # ========== PROJECTS ==========
 
