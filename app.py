@@ -10,7 +10,7 @@ from flask_jsglue import JSGlue
 from flask_sslify import SSLify
 
 # For Gzip flask responses
-from flask_gzip import Gzip
+from flask_compress import Compress
 
 # Dynamic path used to support importing from subdirectories
 # across multiple platforms (tested between Windows and Linux)
@@ -33,7 +33,7 @@ app = Flask(__name__)
 # Initialise JS Glue
 jsglue = JSGlue(app)
 # Initialise Gzip
-gzip = Gzip(app)
+compress = Compress()
 
 @app.route('/')
 def index():
@@ -101,4 +101,5 @@ def entry():
 
 # Run threaded in production!
 if __name__ == '__main__':
+    compress.init_app(app)
     app.run(threaded=True)
