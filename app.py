@@ -9,6 +9,9 @@ from flask_jsglue import JSGlue
 # if user visits website using insecure HTTP address
 from flask_sslify import SSLify
 
+# For Gzip flask responses
+from flask_gzip import Gzip
+
 # Dynamic path used to support importing from subdirectories
 # across multiple platforms (tested between Windows and Linux)
 import os, sys
@@ -29,6 +32,8 @@ app = Flask(__name__)
 
 # Initialise JS Glue
 jsglue = JSGlue(app)
+# Initialise Gzip
+gzip = Gzip(app)
 
 @app.route('/')
 def index():
