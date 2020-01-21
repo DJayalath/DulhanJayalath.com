@@ -65,6 +65,10 @@ def ads():
 
 # ========== PROJECTS ==========
 
+@app.route('/autocuber')
+def autocuber():
+    return render_template('autocuber.html')
+
 @app.route('/telemetry-display')
 def telemetry_display():
     return render_template('telemetry-display.html')
