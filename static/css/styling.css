@@ -130,7 +130,7 @@ h5 {
   color: #fabd2f;
 }
 
-img {
+img, video {
   max-width: 100%;
   height: auto;
   width: auto\9; /* ie8 */
