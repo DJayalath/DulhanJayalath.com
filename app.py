@@ -49,14 +49,6 @@ def about():
 def ray_tracer():
     return render_template('raytracer.html', ads=True)
 
-@app.route('/proper-collision-resolution-and-response')
-def collisions():
-    return render_template('collisions.html', ads=True)
-
-@app.route('/intelligent-music-player')
-def music_player():
-    return render_template('musicplayer.html', ads=True)
-
 # ADSENSE ONLY
 
 @app.route('/ads.txt')
@@ -64,30 +56,6 @@ def ads():
     return render_template('ads.txt')
 
 # ========== PROJECTS ==========
-
-@app.route('/autocuber')
-def autocuber():
-    return render_template('autocuber.html')
-
-@app.route('/telemetry-display')
-def telemetry_display():
-    return render_template('telemetry-display.html')
-
-@app.route('/weather-station')
-def weather_station():
-    return render_template('weather-station.html')	
-
-@app.route('/cloudworks')
-def cloudworks():
-    return render_template('cloudworks.html')
-	
-@app.route('/life')
-def life():
-    return render_template('life.html')
-
-@app.route('/mandelbrot')
-def mandelbrot():
-    return render_template('mandelbrot.html')
 
 @app.route('/decryptr-port')
 def decryptr_port():
